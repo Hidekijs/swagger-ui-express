@@ -192,6 +192,7 @@ var generateHTML = function (swaggerDoc, opts, options, customCss, customfavIcon
     isExplorer = opts.explorer || !!swaggerUrls
     customSiteTitle = opts.customSiteTitle
     customCssUrl = opts.customCssUrl
+    _htmlTplString = opts.customHtml || htmlTplString
   } else {
     //support legacy params based function
     isExplorer = opts

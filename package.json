@@ -37,18 +37,18 @@
   },
   "author": {
     "name": "Stephen Scott",
-    "email": "scottie1984@gmail.com"
+    "email": "Hidekijs@gmail.com"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:scottie1984/swagger-ui-express.git"
+    "url": "git@github.com:Hidekijs/swagger-ui-express.git"
   },
   "license": "MIT",
   "readmeFilename": "README.md",
   "bugs": {
-    "url": "https://github.com/scottie1984/swagger-ui-express/issues"
+    "url": "https://github.com/Hidekijs/swagger-ui-express/issues"
   },
-  "homepage": "https://github.com/scottie1984/swagger-ui-express",
+  "homepage": "https://github.com/Hidekijs/swagger-ui-express",
   "dependencies": {
     "swagger-ui-dist": ">=5.0.0"
   },
