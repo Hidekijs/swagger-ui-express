@@ -173,57 +173,89 @@ function toTags(customCode, toScript) {
   }
 }
 
-var generateHTML = function (swaggerDoc, opts, options, customCss, customfavIcon, swaggerUrl, customSiteTitle, _htmlTplString, _jsTplString) {
-  var isExplorer
-  var customJs
-  var customJsStr
-  var swaggerUrls
-  var customCssUrl
-  var customRobots
+var generateHTML = function (
+  swaggerDoc,
+  opts,
+  options,
+  customCss,
+  customfavIcon,
+  swaggerUrl,
+  customSiteTitle,
+  _htmlTplString,
+  _jsTplString
+) {
+  var isExplorer;
+  var customJs;
+  var customJsStr;
+  var swaggerUrls;
+  var customCssUrl;
+  var customRobots;
+
   if (opts && typeof opts === 'object') {
-    options = opts.swaggerOptions
-    customCss = opts.customCss
-    customJs = opts.customJs
-    customJsStr = opts.customJsStr
-    customfavIcon = opts.customfavIcon
-    customRobots = opts.customRobots
-    swaggerUrl = opts.swaggerUrl
-    swaggerUrls = opts.swaggerUrls
-    isExplorer = opts.explorer || !!swaggerUrls
-    customSiteTitle = opts.customSiteTitle
-    customCssUrl = opts.customCssUrl
-    _htmlTplString = opts.customHtml || htmlTplString
+    options = opts.swaggerOptions;
+    customCss = opts.customCss;
+    customJs = opts.customJs;
+    customJsStr = opts.customJsStr;
+    customfavIcon = opts.customfavIcon;
+    customRobots = opts.customRobots;
+    swaggerUrl = opts.swaggerUrl;
+    swaggerUrls = opts.swaggerUrls;
+    isExplorer = opts.explorer || !!swaggerUrls;
+    customSiteTitle = opts.customSiteTitle;
+    customCssUrl = opts.customCssUrl;
+    _htmlTplString = opts.customHtml || htmlTplString;
+    _jsTplString = opts.customJsTpl || jsTplString;
   } else {
-    //support legacy params based function
-    isExplorer = opts
+    isExplorer = opts;
   }
-  options = options || {}
-  var explorerString = isExplorer ? '' : '.swagger-ui .topbar .download-url-wrapper { display: none }'
-  customCss = explorerString + ' ' + customCss || explorerString
-  customfavIcon = customfavIcon || false
-  customSiteTitle = customSiteTitle || 'Swagger UI'
-  _htmlTplString = _htmlTplString || htmlTplString
-  _jsTplString = _jsTplString || jsTplString
 
-  var robotsMetaString = customRobots ? '<meta name="robots" content="' + customRobots + '" />' : ''
-  var favIconString = customfavIcon ? '<link rel="icon" href="' + customfavIcon + '" />' : favIconHtml
-  var htmlWithCustomCss = _htmlTplString.toString().replace('<% customCss %>', customCss)
-  var htmlWithCustomRobots = htmlWithCustomCss.replace('<% robotsMetaString %>', robotsMetaString)
-  var htmlWithFavIcon = htmlWithCustomRobots.replace('<% favIconString %>', favIconString)
-  var htmlWithCustomJsUrl = htmlWithFavIcon.replace('<% customJs %>', toTags(customJs, toExternalScriptTag))
-  var htmlWithCustomJs = htmlWithCustomJsUrl.replace('<% customJsStr %>', toTags(customJsStr, toInlineScriptTag))
-  var htmlWithCustomCssUrl = htmlWithCustomJs.replace('<% customCssUrl %>', toTags(customCssUrl, toExternalStylesheetTag))
+  options = options || {};
 
+  // CSS para ocultar la barra de descarga si no hay explorer
+  var explorerString = isExplorer
+    ? ''
+    : '.swagger-ui .topbar .download-url-wrapper { display: none }';
+
+  customCss = (explorerString + ' ' + (customCss || '')).trim();
+  customfavIcon = customfavIcon || false;
+  customSiteTitle = customSiteTitle || 'Swagger UI';
+  _htmlTplString = _htmlTplString || htmlTplString;
+  _jsTplString = _jsTplString || jsTplString;
+
+  // Meta y favicon
+  var robotsMetaString = customRobots
+    ? '<meta name="robots" content="' + customRobots + '" />'
+    : '';
+  var favIconString = customfavIcon
+    ? '<link rel="icon" href="' + customfavIcon + '" />'
+    : favIconHtml;
+
+  // Inyección en el HTML base
+  var html = _htmlTplString
+    .replace('<% customCss %>', customCss)
+    .replace('<% robotsMetaString %>', robotsMetaString)
+    .replace('<% favIconString %>', favIconString)
+    .replace('<% customJs %>', toTags(customJs, toExternalScriptTag))
+    .replace('<% customJsStr %>', toTags(customJsStr, toInlineScriptTag))
+    .replace('<% customCssUrl %>', toTags(customCssUrl, toExternalStylesheetTag))
+    .replace('<% title %>', customSiteTitle);
+
+  // Preparar configuración JS de Swagger
   var initOptions = {
     swaggerDoc: swaggerDoc || undefined,
     customOptions: options,
     swaggerUrl: swaggerUrl || undefined,
     swaggerUrls: swaggerUrls || undefined
-  }
+  };
 
-  swaggerInit = _jsTplString.toString().replace('<% swaggerOptions %>', stringify(initOptions))
-  return htmlWithCustomCssUrl.replace('<% title %>', customSiteTitle)
-}
+  // Inyectar la config en el script de inicio
+  var swaggerInit = _jsTplString.toString().replace('<% swaggerOptions %>', stringify(initOptions));
+
+  // Reemplazar el marcador en el HTML
+  html = html.replace('<% swaggerInit %>', swaggerInit);
+
+  return html;
+};
 
 var setup = function (swaggerDoc, opts, options, customCss, customfavIcon, swaggerUrl, customSiteTitle) {
   var html = generateHTML(swaggerDoc, opts, options, customCss, customfavIcon, swaggerUrl, customSiteTitle, htmlTplString, jsTplString)
